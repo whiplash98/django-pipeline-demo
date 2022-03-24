@@ -1,0 +1,37 @@
+# The version of appsec.yml, it is required to be 0.0
+version: 0.0
+# We are deploying this app onto an Ubuntu EC2 instance
+# so the os is Linux
+os: linux
+
+# We are going to be storing our app under /var/www/django
+# So are sourcing the files from the base directory of our app
+# and copying them over to /var/www/django
+# and overwrite any existing files
+files:
+  - source: /
+    destination: /var/www/django
+    overwrite: true
+file_exists_behavior: OVERWRITE
+
+# These are the CodeDeploy lifecycle hooks. In this project,
+# we are only using Install, ApplicationStart, and ApplicationStop
+hooks:
+  # For Install, we will be running our install_dependencies script as a root user
+  # with a timeout of 180 seconds.
+  Install:
+    - location: scripts/install_dependencies.sh
+      timeout: 180
+      runas: root
+  # For ApplicationStart, we will be running our start_server script as root user
+  # with a timeout of 30 seconds. 
+  ApplicationStart:
+    - location: scripts/start_server.sh
+      timeout: 30
+      runas: root
+  # For ApplicationStop, we will be running our stop_server script as root user
+  # with a timeout of 30 seconds.
+  ApplicationStop:
+    - location: scripts/stop_server.sh
+      timeout: 30
+      runas: root
